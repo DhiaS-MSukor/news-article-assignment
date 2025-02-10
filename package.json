@@ -10,8 +10,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.5.1",
+    "@types/humanize-plus": "^1.8.2",
+    "@types/node": "^22.13.1",
+    "axios": "^1.7.9",
+    "axios-mock-adapter": "^2.1.0",
+    "bootstrap": "^5.3.3",
+    "humanize-plus": "^1.8.2",
+    "random-words": "^2.0.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-bootstrap": "^2.10.9",
+    "react-bootstrap-icons": "^1.11.5",
+    "react-dom": "^19.0.0",
+    "react-redux": "^9.2.0",
+    "react-router": "^7.1.5",
+    "react-textarea-autosize": "^8.5.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
