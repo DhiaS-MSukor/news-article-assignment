@@ -2,8 +2,7 @@
 import MockAdapter from 'axios-mock-adapter';
 import Humanize from 'humanize-plus';
 import { generate as randomWords } from 'random-words';
-import { API_ARTICLES } from '../constants';
-import { isDate } from 'util/types';
+import { API_ARTICLES } from '../constants'; 
 
 const mock = new MockAdapter(axios, { delayResponse: 1000 });
 
