@@ -24,6 +24,5 @@ dist-ssr
 *.sw?
 /.vs/news-article-assignment-dhia
 /obj/Debug
-/.vs/news-article-assignment-dhia/v17/DocumentLayout.json
-/package-lock.json
-/.vs/news-article-assignment-dhia/v17/DocumentLayout.backup.json
+/.vs/news-article-assignment-dhia/*
+/package-lock.json 
