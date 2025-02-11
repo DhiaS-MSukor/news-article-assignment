@@ -1,12 +1,13 @@
 import TextareaAutosize from 'react-textarea-autosize';
-import React, { useEffect, useState } from "react";
+import React, { JSX, RefAttributes, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../store";
 import { useNavigate, useParams } from "react-router";
 import { Article } from "../../../data/models";
-import { Form, Button, Card, Stack, Container, ToastContainer, Toast } from "react-bootstrap";
+import { Form, Button, Card, Stack, Container, ToastContainer, Toast, Tooltip, TooltipProps, OverlayTrigger } from "react-bootstrap";
 import { addArticle } from "../../../reducers/addArticle";
 import { updateArticle } from "../../../reducers/updateArticle";
+import { ArrowClockwise, ArrowLeft, ArrowLeftCircle, ArrowLeftCircleFill } from 'react-bootstrap-icons';
 
 interface RouteParams extends Record<string, string | undefined> {
     originalTitle?: string;
@@ -28,7 +29,9 @@ function ArticleFormPage() {
     const [publisher, setPublisher] = useState(articleToEdit ? articleToEdit.publisher : '');
     const [validated, setValidated] = useState(false);
     const [error, setError] = useState<string>();
-    const [showToast, setShowToast] = useState(false);
+    const [successMessage, setSuccessMessage] = useState<string>();
+    const [showErrorToast, setShowErrorToast] = useState(false);
+    const [showMessageToast, setShowMessageToast] = useState(false);
 
     useEffect(() => {
         if (isEditing && articleToEdit) {
@@ -38,6 +41,22 @@ function ArticleFormPage() {
             setPublisher(articleToEdit.publisher);
         }
     }, [isEditing, articleToEdit]);
+
+    const renderTooltip = (props: JSX.IntrinsicAttributes & TooltipProps & RefAttributes<HTMLDivElement>) => (
+        <Tooltip id="button-tooltip" {...props}>
+            Go Back
+        </Tooltip>
+    );
+
+    const handleGoBack = () => navigate('/');
+
+    const clearForm = () => {
+        setTitle('');
+        setSummary('');
+        setDate('');
+        setPublisher('');
+        setValidated(false);
+    };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         const form = e.currentTarget;
@@ -51,24 +70,28 @@ function ArticleFormPage() {
         }
         setValidated(true);
 
-        if (!title || !summary || !date || !publisher) return; 
+        if (!title || !summary || !date || !publisher) return;
         if (isEditing && originalTitle) {
             dispatch(updateArticle({ originalTitle, updatedArticle: { title, summary, date, publisher } }))
-                .unwrap() 
+                .unwrap()
                 .then(
                     () => navigate('/'),
                     e => {
-                        setShowToast(true);
                         setError(e.message);
+                        setShowErrorToast(true);
                     });
         } else {
             dispatch(addArticle({ title, summary, date, publisher }))
                 .unwrap()
                 .then(
-                    () => navigate('/'),
+                    () => {
+                        clearForm();
+                        setSuccessMessage('New article added');
+                        setShowMessageToast(true);
+                    },
                     e => {
-                        setShowToast(true);
                         setError(e.message);
+                        setShowErrorToast(true);
                     });
         }
     };
@@ -78,7 +101,18 @@ function ArticleFormPage() {
             <Form noValidate validated={validated} onSubmit={handleSubmit}>
                 <Card className="">
                     <Card.Header>
-                        <h1>{isEditing ? 'Edit Article' : 'Add Article'}</h1>
+                        <Stack direction="horizontal" gap={3}>
+                            <OverlayTrigger
+                                placement="bottom"
+                                delay={{ show: 100, hide: 500 }}
+                                overlay={renderTooltip}
+                            >
+                                <Button variant='outline-secondary' onClick={handleGoBack}>
+                                    <ArrowLeft />
+                                </Button>
+                            </OverlayTrigger>
+                            <h1>{isEditing ? 'Edit Article' : 'Add Article'}</h1>
+                        </Stack>
                     </Card.Header>
                     <Card.Body>
                         <Form.Floating className="mt-2">
@@ -121,11 +155,17 @@ function ArticleFormPage() {
                 </Card>
             </Form>
             <ToastContainer position="bottom-start" className="p-3">
-                <Toast show={showToast} onClose={() => setShowToast(false)} delay={5000} autohide bg="danger">
+                <Toast show={showErrorToast} onClose={() => setShowErrorToast(false)} delay={5000} autohide bg="danger">
                     <Toast.Header>
                         <strong className="me-auto">Error</strong>
                     </Toast.Header>
                     <Toast.Body className="text-white">{error}</Toast.Body>
+                </Toast>
+                <Toast show={showMessageToast} onClose={() => setShowMessageToast(false)} delay={5000} autohide bg="success">
+                    <Toast.Header>
+                        <strong className="me-auto">Success</strong>
+                    </Toast.Header>
+                    <Toast.Body className="text-white">{successMessage}</Toast.Body>
                 </Toast>
             </ToastContainer>
         </Container>
